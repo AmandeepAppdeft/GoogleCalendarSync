@@ -54,20 +54,60 @@ def is_channel_id_unique(channel_id):
 
 @csrf_exempt
 def execute_script(request):
-    global unique_channel_id  # Ensure the uniqueness check for channel ID
+    global unique_channel_id, existing_channel_ids
 
     if request.method == 'POST':
         creds = load_credentials()
 
         if not creds or not creds.valid:
             creds = authenticate()
+
+        unique_channel_id = generate_unique_id()
+
+        # Ensure the channel ID is unique within a reasonable number of attempts
+        max_attempts = 5
+        attempts = 0
+
+        while not is_channel_id_unique(unique_channel_id) and attempts < max_attempts:
+            unique_channel_id = generate_unique_id()
+            attempts += 1
+
+        if attempts == max_attempts:
+            return JsonResponse({'error': 'Failed to generate a unique channel ID'})
+
+        existing_channel_ids.add(unique_channel_id)
+        result = calendar_updated(creds, unique_channel_id)
+
+        if result == 0:
+            # Assuming calendar_updated was successful, attempt to remove the channel ID
+            if unique_channel_id in existing_channel_ids:
+                existing_channel_ids.remove(unique_channel_id)
+            return JsonResponse({'message': 'Success'})
+        else:
+            # If there was an error, remove the ID if it exists in the set
+            if unique_channel_id in existing_channel_ids:
+                existing_channel_ids.remove(unique_channel_id)
+            return JsonResponse({'error': 'Calendar update failed'})
+
+    return JsonResponse({'error': 'POST request required'})
+
+
+# @csrf_exempt
+# def execute_script(request):
+#     global unique_channel_id  # Ensure the uniqueness check for channel ID
+
+#     if request.method == 'POST':
+#         creds = load_credentials()
+
+#         if not creds or not creds.valid:
+#             creds = authenticate()
             
-        if is_channel_id_unique(unique_channel_id):
-            existing_channel_ids.add(unique_channel_id)  # Add the channel ID to the set
-            calendar_updated(creds, unique_channel_id)  # Process calendar update
+#         if is_channel_id_unique(unique_channel_id):
+#             existing_channel_ids.add(unique_channel_id)  # Add the channel ID to the set
+#             calendar_updated(creds, unique_channel_id)  # Process calendar update
 
-        return JsonResponse({'message': 'Success'})
+#         return JsonResponse({'message': 'Success'})
 
-    else:
-        return JsonResponse({'error': 'POST request required'})
+#     else:
+#         return JsonResponse({'error': 'POST request required'})
     
