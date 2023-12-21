@@ -38,7 +38,7 @@ def authenticate():
         './credentials.json', SCOPES)
     
     # Use localhost instead of 5001 to avoid port conflicts
-    creds = flow.run_local_server(port=5001)
+    creds = flow.run_local_server(port=8001)
 
     # Save the credentials for the next run
     with open(TOKEN_FILE_PATH, 'w') as token:

@@ -17,7 +17,7 @@ def calendar_updated(creds, unique_channel_id):
         channel = {
                     'id': unique_channel_id,
                     'type': 'web_hook',
-                    'address': 'https://26f2-223-178-213-9.ngrok-free.app/myapp/execute/'
+                    'address': 'https://3c88-223-178-208-185.ngrok-free.app/myapp/execute/'
                 }
 
         watch_request = service.events().watch(calendarId=calendar_id, body=channel)
@@ -53,11 +53,13 @@ def calendar_updated(creds, unique_channel_id):
             encoded_tag = urllib.parse.quote(tag)
 
             headers = {
-                'Authorization': 'pk_10657489_H8XHRQSY9H5DWGG2K8C55CD9QGC4XLTA',
+                'Authorization': 'pk_72649265_2QJTM1SYMSIUCVWV4T6VG4K9B91WD17Z',
+                # 'Authorization': 'pk_10657489_H8XHRQSY9H5DWGG2K8C55CD9QGC4XLTA',
                 'Content-Type': 'application/json',
             }
             response = requests.get(
-                f'https://api.clickup.com/api/v2/team/20611636/task?tags[]={encoded_tag}&subtasks=true', headers=headers)
+                f'https://api.clickup.com/api/v2/team/9016081736/task?tags[]={encoded_tag}&subtasks=true', headers=headers)
+                # f'https://api.clickup.com/api/v2/team/20611636/task?tags[]={encoded_tag}&subtasks=true', headers=headers)
 
 
             tasks = response.json().get('tasks', [])
